@@ -1,11 +1,11 @@
 [package]
 version = "0.1.0"
-name = "fibonacci-script"
+name = "settlement-script"
 edition = "2021"
-default-run = "fibonacci"
+default-run = "settlement-demo"
 
 [[bin]]
-name = "fibonacci"
+name = "settlement-demo"
 path = "src/bin/main.rs"
 
 [[bin]]
@@ -16,16 +16,22 @@ path = "src/bin/evm.rs"
 name = "vkey"
 path = "src/bin/vkey.rs"
 
-[dependencies]
-sp1-sdk = "5.0.8"
-serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
-serde = { version = "1.0.200", default-features = false, features = ["derive"] }
-clap = { version = "4.0", features = ["derive", "env"] }
-tracing = "0.1.40"
-hex = "0.4.3"
-alloy-sol-types = { workspace = true }
-fibonacci-lib = { path = "../lib" }
-dotenv = "0.15.0"
+[[bin]]
+name = "merkle"
+path = "src/bin/merkle.rs"
 
+[dependencies]
+sp1-sdk.workspace = true
+tokio.workspace = true
+serde_json.workspace = true
+serde.workspace = true
+clap.workspace = true
+tracing.workspace = true
+hex.workspace = true
+dotenv.workspace = true
+alloy-sol-types = { workspace = true }
+settlement-lib = { path = "../lib" }
+bankai-sdk.workspace = true
+alloy-primitives.workspace = true
 [build-dependencies]
-sp1-build = "5.0.8"
+sp1-build = "5.2.2"
