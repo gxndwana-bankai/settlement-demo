@@ -87,3 +87,30 @@ command:
 ```sh
 SP1_PROVER=network NETWORK_PRIVATE_KEY=... cargo run --release --bin evm
 ```
+
+## Settlement CLI
+
+This project includes a command-line interface for interacting with the settlement smart contracts.
+
+### Quick Start
+
+```sh
+# Build the CLI
+./install-cli.sh
+
+# Setup environment variables (see CLI_README.md for details)
+cp .env.example .env
+# Edit .env with your configuration
+
+# Reset orders on all chains
+./target/release/cli reset --dry-run
+./target/release/cli reset
+
+# Settle orders on a specific chain
+./target/release/cli settle base-sepolia --dry-run
+./target/release/cli settle base-sepolia
+```
+
+For complete documentation, see:
+- [CLI_README.md](./CLI_README.md) - Full documentation
+- [CLI_QUICKSTART.md](./CLI_QUICKSTART.md) - Quick reference guide

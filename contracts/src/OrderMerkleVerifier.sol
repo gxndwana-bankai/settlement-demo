@@ -69,6 +69,12 @@ contract SettlementContract {
         }
     }
 
+    function resetOrders(bytes32[] memory orderHashes) public {
+        for (uint256 i = 0; i < orderHashes.length; i++) {
+            orderMapping[orderHashes[i]] = false;
+        }
+    }
+
     /// @notice Hashes an order using keccak256
     /// @param order The order to hash
     /// @return The hash of the order
