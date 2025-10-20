@@ -1,0 +1,16 @@
+[programs.localnet]
+settlement_solana_program = "11111111111111111111111111111111"
+
+[registry]
+url = "https://anchor.projectserum.com"
+
+[provider]
+cluster = "Localnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "anchor test"
+
+[workspace]
+members = ["program"]
+

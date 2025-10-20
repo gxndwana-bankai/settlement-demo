@@ -28,6 +28,10 @@ path = "src/bin/settle.rs"
 name = "cli"
 path = "src/bin/cli.rs"
 
+[[bin]]
+name = "solana"
+path = "src/bin/solana.rs"
+
 [dependencies]
 sp1-sdk.workspace = true
 tokio.workspace = true

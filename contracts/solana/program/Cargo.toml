@@ -1,0 +1,16 @@
+[package]
+name = "settlement-solana-program"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "settlement_solana_program"
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+anchor-lang = "0.29.0"
+solana-program = "1.18.18"
+sp1-solana = { git = "https://github.com/succinctlabs/sp1-solana" }
+
+[profile.release]
+overflow-checks = true
