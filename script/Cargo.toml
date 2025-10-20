@@ -4,33 +4,17 @@ name = "settlement-script"
 edition = "2021"
 default-run = "settlement-demo"
 
+[lib]
+name = "settlement_script"
+path = "src/lib.rs"
+
 [[bin]]
 name = "settlement-demo"
 path = "src/bin/main.rs"
 
 [[bin]]
-name = "evm"
-path = "src/bin/evm.rs"
-
-[[bin]]
-name = "vkey"
-path = "src/bin/vkey.rs"
-
-[[bin]]
-name = "merkle"
-path = "src/bin/merkle.rs"
-
-[[bin]]
-name = "settle"
-path = "src/bin/settle.rs"
-
-[[bin]]
 name = "cli"
 path = "src/bin/cli.rs"
-
-[[bin]]
-name = "solana"
-path = "src/bin/solana.rs"
 
 [dependencies]
 sp1-sdk.workspace = true
@@ -50,5 +34,10 @@ alloy-rpc-types.workspace = true
 alloy-signer.workspace = true
 alloy-signer-local.workspace = true
 alloy-network.workspace = true
+solana-sdk = "2.0"
+solana-client = "2.0"
+bs58 = "0.5"
+borsh = "1.5"
+async-trait = "0.1"
 [build-dependencies]
 sp1-build = "5.2.2"

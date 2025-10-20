@@ -6,8 +6,8 @@ pub mod state;
 use merkle::verify_merkle_proof_keccak;
 use state::*;
 
-declare_id!("9GrAFZAUtkj69pJRh1dzHnKxF8aZaEVFcYAN5RjMmb2f");
-const BANKAI_VKEY_HASH: &str = "0x001ef62344ca35708c7af9dc5cda28683244720d303d480b47d82136ede2b8ed";
+declare_id!("HpgNxwdekXixEW6ZzTPsjhhFx46fpfoC7ruJvsinPYHx");
+const BANKAI_VKEY_HASH: &str = "0x00066134a7034de590bed58280f2e34f7a3556f2bcb6fdd20b4469e6bc85b265";
 #[program]
 pub mod bankai_solana {
     use super::*;
@@ -31,6 +31,16 @@ pub mod bankai_solana {
         order_status.order_hash = computed;
         order_status.settled = false;
         order_status.bump = ctx.bumps.order_status;
+
+        emit!(OrderSubmitted {
+            order_hash: computed,
+            source_chain_id: order.source_chain_id,
+            destination_chain_id: order.destination_chain_id,
+            receiver: order.receiver,
+            amount: order.amount,
+            block_number: order.block_number,
+        });
+
         Ok(())
     }
 
@@ -163,6 +173,16 @@ pub enum SettlementError {
     InvalidMerkleProof,
     #[msg("Order hash mismatch")]
     InvalidOrderHash,
+}
+
+#[event]
+pub struct OrderSubmitted {
+    pub order_hash: [u8; 32],
+    pub source_chain_id: u64,
+    pub destination_chain_id: u64,
+    pub receiver: [u8; 20],
+    pub amount: [u8; 32],
+    pub block_number: u64,
 }
 
 #[event]

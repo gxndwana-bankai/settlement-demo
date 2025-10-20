@@ -23,7 +23,7 @@ custom-panic = []
 [dependencies]
 anchor-lang = "0.32.1"
 sp1-solana = { git = "https://github.com/succinctlabs/sp1-solana" }
-solana-program = "1.18"
+solana-program = "2.0"
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_os, values("solana"))'] }

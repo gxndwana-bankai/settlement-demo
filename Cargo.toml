@@ -4,7 +4,12 @@ members = [
     "program",
     "script",
 ]
+default-members = ["lib", "script"]
 resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
 
 [workspace.dependencies]
 bankai-sdk = { git = "https://github.com/bankaixyz/bankai-sdk", package = "bankai-sdk", rev = "76c9b968b03fff7b8a800e1f0ff62744e881baed" }

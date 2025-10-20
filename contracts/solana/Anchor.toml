@@ -6,7 +6,10 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-bankai_solana = "9GrAFZAUtkj69pJRh1dzHnKxF8aZaEVFcYAN5RjMmb2f"
+bankai_solana = "HpgNxwdekXixEW6ZzTPsjhhFx46fpfoC7ruJvsinPYHx"
+
+[programs.devnet]
+bankai_solana = "HpgNxwdekXixEW6ZzTPsjhhFx46fpfoC7ruJvsinPYHx"
 
 [registry]
 url = "https://api.apr.dev"
