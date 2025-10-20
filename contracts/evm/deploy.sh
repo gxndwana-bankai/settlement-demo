@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Load environment variables
-source ../.env
+source .env
 
 # Deploy to Base Sepolia (Chain ID: 84532)
 echo "Deploying to Base Sepolia (Chain ID: 84532)..."

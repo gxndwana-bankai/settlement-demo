@@ -38,7 +38,7 @@ contract SettlementContract {
     function submitOrder(
         Order memory order
     ) public {
-        require(order.sourceChainId != block.chainid, "Wrong chain id set");
+        require(order.sourceChainId == block.chainid, "Wrong chain id set");
         bytes32 orderHash = hashOrder(order);
         require(!orderMapping[orderHash], "Order already exists");
         orderMapping[orderHash] = false;

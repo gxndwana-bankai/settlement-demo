@@ -6,13 +6,14 @@ use alloy_signer_local::PrivateKeySigner;
 use alloy_sol_types::{sol, SolCall};
 use clap::{Parser, Subcommand};
 use serde::{Deserialize, Serialize};
+use settlement_lib::Order;
 use std::collections::BTreeMap;
 use std::fs;
 use std::str::FromStr;
 
 sol! {
     #[derive(Debug)]
-    struct Order {
+    struct SolOrder {
         uint64 sourceChainId;
         uint64 destinationChainId;
         address receiver;
@@ -34,6 +35,8 @@ sol! {
     ) external;
 
     function resetOrders(bytes32[] memory orderHashes) external;
+
+    function submitOrder(SolOrder memory order) external;
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -50,19 +53,20 @@ struct ProofData {
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 struct OrderProofJson {
-    order: OrderJson,
+    order: Order,
     order_hash: String,
     proof: Vec<String>,
     leaf_index: usize,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
-struct OrderJson {
+struct Transaction {
     source_chain_id: u64,
     destination_chain_id: u64,
     receiver: String,
     amount: String,
     block_number: u64,
+    tx_hash: String,
 }
 
 #[derive(Debug, Clone)]
@@ -142,6 +146,10 @@ struct Cli {
     #[arg(short, long, default_value = "proof.json", global = true)]
     proof_file: String,
 
+    /// Path to the transactions JSON file
+    #[arg(short = 't', long, default_value = "txs.json", global = true)]
+    txs_file: String,
+
     /// Private key for signing transactions (from PRIVATE_KEY env var)
     #[arg(
         short = 'k',
@@ -159,11 +167,20 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
-    /// Reset orders on all chains
-    Reset,
+    /// Reset orders on one or all chains
+    Reset {
+        /// Chain name (base-sepolia, arbitrum-sepolia, all)
+        #[arg(default_value = "all")]
+        chain: String,
+    },
     /// Settle orders on a specific chain
     Settle {
         /// Chain name (base-sepolia, arbitrum-sepolia)
+        chain: String,
+    },
+    /// Submit orders from txs.json to a specific destination chain
+    Submit {
+        /// Destination chain name (base-sepolia, arbitrum-sepolia)
         chain: String,
     },
 }
@@ -181,12 +198,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let proof_data: ProofData = serde_json::from_str(&proof_json)?;
 
     match cli.command {
-        Commands::Reset => {
-            reset_orders(&proof_data, &private_key, cli.dry_run).await?;
+        Commands::Reset { chain } => {
+            reset_orders(&proof_data, &chain, &private_key, cli.dry_run).await?;
         }
         Commands::Settle { chain } => {
             let chain = Chain::from_name(&chain)?;
             settle_orders(&proof_data, chain, &private_key, cli.dry_run).await?;
+        }
+        Commands::Submit { chain } => {
+            let chain = Chain::from_name(&chain)?;
+            submit_orders(&cli.txs_file, chain, &private_key, cli.dry_run).await?;
         }
     }
 
@@ -195,12 +216,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 async fn reset_orders(
     proof_data: &ProofData,
+    chain_name: &str,
     private_key: &str,
     dry_run: bool,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    println!("🔄 Resetting orders on all chains...\n");
-
-    let chains = vec![Chain::BaseSepolia, Chain::ArbitrumSepolia];
+    let chains = if chain_name.to_lowercase() == "all" {
+        println!("🔄 Resetting orders on all chains...\n");
+        vec![Chain::BaseSepolia, Chain::ArbitrumSepolia]
+    } else {
+        let chain = Chain::from_name(chain_name)?;
+        println!("🔄 Resetting orders on {}...\n", chain.name());
+        vec![chain]
+    };
 
     for chain in chains {
         let chain_id_str = chain.chain_id().to_string();
@@ -276,8 +303,10 @@ async fn reset_orders(
 
     if dry_run {
         println!("🔍 Dry run completed - no transactions sent");
-    } else {
+    } else if chain_name.to_lowercase() == "all" {
         println!("✅ All reset operations completed");
+    } else {
+        println!("✅ Reset operation completed");
     }
 
     Ok(())
@@ -404,6 +433,120 @@ async fn settle_orders(
     } else {
         println!("\n❌ Transaction failed!");
         return Err("Transaction reverted".into());
+    }
+
+    Ok(())
+}
+
+async fn submit_orders(
+    txs_file: &str,
+    chain: Chain,
+    private_key: &str,
+    dry_run: bool,
+) -> Result<(), Box<dyn std::error::Error>> {
+    println!("📝 Submitting orders to {}...\n", chain.name());
+
+    let config = ChainConfig::load(chain.clone())?;
+
+    let txs_json = fs::read_to_string(txs_file)?;
+    let transactions: Vec<Transaction> = serde_json::from_str(&txs_json)?;
+
+    let filtered_txs: Vec<&Transaction> = transactions
+        .iter()
+        .filter(|tx| tx.source_chain_id == chain.chain_id())
+        .collect();
+
+    if filtered_txs.is_empty() {
+        println!("ℹ️  No orders found with source {}", chain.name());
+        return Ok(());
+    }
+
+    println!("📦 Found {} orders to submit", filtered_txs.len());
+    for (i, tx) in filtered_txs.iter().enumerate() {
+        println!(
+            "   {}. From chain {} → {} (amount: {} wei, block: {})",
+            i + 1,
+            tx.source_chain_id,
+            tx.receiver,
+            tx.amount,
+            tx.block_number
+        );
+    }
+    println!();
+
+    println!("📋 Contract: {}", config.contract_address);
+    println!();
+
+    let signer: PrivateKeySigner = private_key.parse()?;
+    let wallet = EthereumWallet::from(signer);
+    let sender_address = wallet.default_signer().address();
+
+    println!("👤 Sender: {sender_address}\n");
+
+    let provider = ProviderBuilder::new()
+        .wallet(wallet)
+        .connect_http(config.rpc_url.parse()?);
+
+    let contract_address = Address::from_str(&config.contract_address)?;
+
+    for (i, tx) in filtered_txs.iter().enumerate() {
+        println!("📤 [{}/{}] Submitting order...", i + 1, filtered_txs.len());
+
+        let receiver = Address::from_str(&tx.receiver)?;
+        let amount = alloy_primitives::U256::from_str(&tx.amount)?;
+
+        let order = Order {
+            source_chain_id: tx.source_chain_id,
+            destination_chain_id: tx.destination_chain_id,
+            receiver,
+            amount,
+            block_number: tx.block_number,
+        };
+
+        let order_hash = order.hash();
+
+        println!("   Order hash: 0x{}", hex::encode(order_hash));
+
+        let sol_order = SolOrder {
+            sourceChainId: order.source_chain_id,
+            destinationChainId: order.destination_chain_id,
+            receiver: order.receiver,
+            amount: order.amount,
+            blockNumber: order.block_number,
+        };
+
+        let call = submitOrderCall { order: sol_order };
+        let calldata = call.abi_encode();
+
+        let tx_req = TransactionRequest::default()
+            .to(contract_address)
+            .input(calldata.into());
+
+        if dry_run {
+            println!("   ✅ Dry run - transaction prepared\n");
+            continue;
+        }
+
+        let pending_tx = provider.send_transaction(tx_req).await?;
+        let tx_hash = pending_tx.tx_hash();
+
+        println!("   Tx hash: {tx_hash}");
+        println!("   Waiting for confirmation...");
+
+        let receipt = pending_tx.get_receipt().await?;
+
+        if receipt.status() {
+            println!("   ✅ Success (Gas: {})\n", receipt.gas_used);
+        } else {
+            println!("   ❌ Failed\n");
+            return Err("Transaction reverted".into());
+        }
+    }
+
+    if dry_run {
+        println!("🔍 Dry run completed - no transactions sent");
+    } else {
+        println!("✅ All orders submitted successfully!");
     }
 
     Ok(())
