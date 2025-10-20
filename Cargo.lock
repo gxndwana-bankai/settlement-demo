@@ -1639,7 +1639,7 @@ dependencies = [
 [[package]]
 name = "bankai-sdk"
 version = "0.1.0"
-source = "git+https://github.com/bankaixyz/bankai-sdk?rev=8b92b50#8b92b501e98fe87acd41ad8105bc2e4538e3b60f"
+source = "git+https://github.com/bankaixyz/bankai-sdk?rev=76c9b968b03fff7b8a800e1f0ff62744e881baed#76c9b968b03fff7b8a800e1f0ff62744e881baed"
 dependencies = [
  "accumulators",
  "alloy-primitives",
@@ -1670,7 +1670,7 @@ dependencies = [
 [[package]]
 name = "bankai-types"
 version = "0.1.0"
-source = "git+https://github.com/bankaixyz/bankai-sdk?rev=8b92b50#8b92b501e98fe87acd41ad8105bc2e4538e3b60f"
+source = "git+https://github.com/bankaixyz/bankai-sdk?rev=76c9b968b03fff7b8a800e1f0ff62744e881baed#76c9b968b03fff7b8a800e1f0ff62744e881baed"
 dependencies = [
  "alloy-consensus",
  "alloy-primitives",
@@ -1690,7 +1690,7 @@ dependencies = [
 [[package]]
 name = "bankai-verify"
 version = "0.1.0"
-source = "git+https://github.com/bankaixyz/bankai-sdk?rev=8b92b50#8b92b501e98fe87acd41ad8105bc2e4538e3b60f"
+source = "git+https://github.com/bankaixyz/bankai-sdk?rev=76c9b968b03fff7b8a800e1f0ff62744e881baed#76c9b968b03fff7b8a800e1f0ff62744e881baed"
 dependencies = [
  "alloy-primitives",
  "alloy-rlp",
@@ -7510,7 +7510,11 @@ dependencies = [
 name = "settlement-program"
 version = "0.1.0"
 dependencies = [
+ "alloy-consensus",
  "alloy-sol-types",
+ "bankai-types",
+ "bankai-verify",
+ "serde_json",
  "settlement-lib",
  "sp1-zkvm",
 ]

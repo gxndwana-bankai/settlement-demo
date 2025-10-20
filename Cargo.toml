@@ -7,15 +7,16 @@ members = [
 resolver = "2"
 
 [workspace.dependencies]
-bankai-sdk = { git = "https://github.com/bankaixyz/bankai-sdk", package = "bankai-sdk", rev = "8b92b50" }
-bankai-types = { git = "https://github.com/bankaixyz/bankai-sdk", package = "bankai-types", rev = "8b92b50", default-features = false, features = ["verifier-types"] }
-bankai-verify = { git = "https://github.com/bankaixyz/bankai-sdk", package = "bankai-verify", rev = "8b92b50", default-features = false }
+bankai-sdk = { git = "https://github.com/bankaixyz/bankai-sdk", package = "bankai-sdk", rev = "76c9b968b03fff7b8a800e1f0ff62744e881baed" }
+bankai-types = { git = "https://github.com/bankaixyz/bankai-sdk", package = "bankai-types", rev = "76c9b968b03fff7b8a800e1f0ff62744e881baed", default-features = false, features = ["verifier-types"] }
+bankai-verify = { git = "https://github.com/bankaixyz/bankai-sdk", package = "bankai-verify", rev = "76c9b968b03fff7b8a800e1f0ff62744e881baed", default-features = false }
 sp1-sdk = "5.2.2"
 sp1-zkvm = "5.2.2"
 
 
 alloy-sol-types = "1.0"
 alloy-primitives = { version = "1.3.1", default-features = false, features = ["serde"] }
+alloy-consensus = { version = "1.0", default-features = false }
 tokio = { version = "1.39.0", default-features = false }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 serde = { version = "1.0.200", default-features = false, features = ["derive"] }

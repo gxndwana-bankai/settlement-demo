@@ -45,14 +45,14 @@ fn hash_pair(a: &[u8; 32], b: &[u8; 32]) -> [u8; 32] {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OrderProof {
     pub order: Order,
-    pub proof: Vec<String>,
+    pub proof: Vec<FixedBytes<32>>,
     pub leaf_index: usize,
 }
 
 /// Complete Merkle tree data including root and all proofs
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MerkleTreeData {
-    pub root: String,
+    pub root: FixedBytes<32>,
     pub proofs: Vec<OrderProof>,
 }
 
@@ -85,7 +85,7 @@ pub fn generate_merkle_root(orders: &[Order]) -> FixedBytes<32> {
 pub fn generate_all_proofs(orders: &[Order]) -> MerkleTreeData {
     if orders.is_empty() {
         return MerkleTreeData {
-            root: "0x0000000000000000000000000000000000000000000000000000000000000000".to_string(),
+            root: FixedBytes::ZERO,
             proofs: vec![],
         };
     }
@@ -103,7 +103,7 @@ pub fn generate_all_proofs(orders: &[Order]) -> MerkleTreeData {
                 order: order.clone(),
                 proof: proof_hashes
                     .iter()
-                    .map(|hash| format!("0x{}", hex::encode(hash)))
+                    .map(|hash| FixedBytes::<32>::from_slice(hash))
                     .collect(),
                 leaf_index: index,
             }
@@ -111,7 +111,7 @@ pub fn generate_all_proofs(orders: &[Order]) -> MerkleTreeData {
         .collect();
 
     MerkleTreeData {
-        root: format!("0x{}", hex::encode(root)),
+        root: root.into(),
         proofs,
     }
 }
