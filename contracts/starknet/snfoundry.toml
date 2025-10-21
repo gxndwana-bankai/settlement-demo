@@ -1,0 +1,11 @@
+[sncast.default]
+url = "http://127.0.0.1:5050/rpc"
+
+# For testnet deployment
+[sncast.sepolia]
+url = "https://starknet-sepolia.public.blastapi.io/rpc/v0_7"
+
+# For mainnet deployment
+[sncast.mainnet]
+url = "https://starknet-mainnet.public.blastapi.io/rpc/v0_7"
+
