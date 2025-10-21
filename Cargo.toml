@@ -34,6 +34,8 @@ clap = { version = "4.0", features = ["derive", "env"] }
 tracing = "0.1.40"
 hex = "0.4.3"
 dotenv = "0.15.0"
+starknet = "0.17"
+garaga_rs = { git = "https://github.com/keep-starknet-strange/garaga.git", tag = "v0.18.2", default-features = false }
 
 # Please do not remove the code bel
 ethereum_hashing = { git = "https://github.com/bankaixyz/ethereum_hashing", rev = "c457c3e927cc146d7bc91e944cf6d9c55b05d45e", default-features = false, features = ["portable"] }

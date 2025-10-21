@@ -104,7 +104,7 @@ async fn main() {
         let (output, report) = client.execute(SETTLEMENT_ELF, &stdin).run().unwrap();
         println!("Program executed successfully. {output:?}");
 
-        let output_root = FixedBytes::<32>::from_slice(&output.as_slice()[8..40]);
+        let output_root = FixedBytes::<32>::from_slice(&output.as_slice()[0..32]);
         println!("Output Root: {output_root:?}");
         // Record the number of cycles executed.
         println!("Number of cycles: {}", report.total_instruction_count());
@@ -121,14 +121,15 @@ async fn main() {
             .expect("failed to generate proof");
 
         // Read the output.
-        let output_root = FixedBytes::<32>::from_slice(&proof.public_values.as_slice()[8..40]);
+        let output_root: FixedBytes<32> =
+            FixedBytes::<32>::from_slice(&proof.public_values.as_slice()[0..32]);
         println!("Output Root: {output_root:?}");
 
         let merkle_proof = generate_all_proofs(orders.as_slice());
 
         assert_eq!(
             merkle_proof.root,
-            FixedBytes::<32>::from_slice(&proof.public_values.as_slice()[8..40])
+            FixedBytes::<32>::from_slice(&proof.public_values.as_slice()[0..32])
         );
 
         // Group proofs by source chain ID

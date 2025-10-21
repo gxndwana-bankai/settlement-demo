@@ -54,10 +54,10 @@ contract SettlementContract {
         // verify the zk proof
         ISP1Verifier(verifier).verifyProof(vk, publicValues, proofBytes);
         
-        // Extract merkle root from bytes 8..40 of publicValues
+        // Extract merkle root from bytes 0..32 of publicValues
         bytes32 merkleRoot;
         assembly {
-            merkleRoot := calldataload(add(publicValues.offset, 8))
+            merkleRoot := calldataload(publicValues.offset)
         }
         
         for (uint256 i = 0; i < orderProofs.length; i++) {

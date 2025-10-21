@@ -7,7 +7,7 @@ use merkle::verify_merkle_proof_keccak;
 use state::*;
 
 declare_id!("HpgNxwdekXixEW6ZzTPsjhhFx46fpfoC7ruJvsinPYHx");
-const BANKAI_VKEY_HASH: &str = "0x00066134a7034de590bed58280f2e34f7a3556f2bcb6fdd20b4469e6bc85b265";
+const BANKAI_VKEY_HASH: &str = "0x003d29a51a01c697e8de906c75c27852dbd2340ba91ae2f033c64a3e8f0228c5";
 #[program]
 pub mod bankai_solana {
     use super::*;
@@ -57,12 +57,12 @@ pub mod bankai_solana {
         sp1_solana::verify_proof(&groth16_proof, &sp1_public_inputs, BANKAI_VKEY_HASH, vk)
             .map_err(|_| error!(SettlementError::InvalidProof))?;
 
-        // Extract merkle root from bytes 8..40
+        // Extract merkle root from bytes 0..32
         require!(
-            sp1_public_inputs.len() >= 40,
+            sp1_public_inputs.len() >= 32,
             SettlementError::InvalidPublicInputs
         );
-        let merkle_root: [u8; 32] = sp1_public_inputs[8..40]
+        let merkle_root: [u8; 32] = sp1_public_inputs[0..32]
             .try_into()
             .map_err(|_| error!(SettlementError::InvalidPublicInputs))?;
 

@@ -1,6 +1,7 @@
 use clap::{Parser, Subcommand};
 use settlement_script::client::{
-    Chain, ChainClient, ChainConfig, EvmClient, ProofData, SolanaClient, Transaction,
+    Chain, ChainClient, ChainConfig, EvmClient, ProofData, SolanaClient, StarknetClient,
+    Transaction,
 };
 use std::fs;
 
@@ -38,6 +39,7 @@ struct Cli {
     )]
     solana_private_key: Option<String>,
 
+
     /// Dry run mode - don't actually send transactions
     #[arg(long, global = true)]
     dry_run: bool,
@@ -52,18 +54,18 @@ enum Commands {
     },
     /// Reset orders on one or all chains
     Reset {
-        /// Chain name (base-sepolia, arbitrum-sepolia, solana-devnet, all)
+        /// Chain name (base-sepolia, arbitrum-sepolia, solana-devnet, starknet-sepolia, all)
         #[arg(default_value = "all")]
         chain: String,
     },
     /// Settle orders on a specific chain
     Settle {
-        /// Chain name (base-sepolia, arbitrum-sepolia, solana-devnet)
+        /// Chain name (base-sepolia, arbitrum-sepolia, solana-devnet, starknet-sepolia)
         chain: String,
     },
     /// Submit orders from txs.json to a specific destination chain
     Submit {
-        /// Chain name (base-sepolia, arbitrum-sepolia, solana-devnet)
+        /// Chain name (base-sepolia, arbitrum-sepolia, solana-devnet, starknet-sepolia)
         chain: String,
     },
 }
@@ -88,7 +90,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::Reset { chain } => {
             if chain.to_lowercase() == "all" {
                 println!("🔄 Resetting orders on all chains...\n");
-                for chain in [Chain::BaseSepolia, Chain::ArbitrumSepolia] {
+                for chain in [
+                    Chain::BaseSepolia,
+                    Chain::ArbitrumSepolia,
+                    Chain::StarknetSepolia,
+                ] {
                     match create_client(chain, &cli) {
                         Ok(client) => {
                             if let Err(e) = client.reset_orders(&proof_data, cli.dry_run).await {
@@ -153,6 +159,9 @@ fn create_client(
                 config,
                 solana_private_key.clone(),
             )?))
+        }
+        Chain::StarknetSepolia => {
+            Ok(Box::new(StarknetClient::new(config)?))
         }
     }
 }

@@ -3,12 +3,25 @@ pragma solidity ^0.8.20;
 
 import "forge-std/Test.sol";
 import "../src/OrderMerkleVerifier.sol";
+import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 contract OrderMerkleVerifierTest is Test {
-    OrderMerkleVerifier public verifier;
+    SettlementContract public verifier;
 
     function setUp() public {
-        verifier = new OrderMerkleVerifier();
+        bytes32[] memory roots = new bytes32[](0);
+        bytes32 vk = bytes32(0);
+        address mockVerifier = address(0);
+        verifier = new SettlementContract(roots, vk, mockVerifier);
+    }
+    
+    function verifyOrder(
+        SettlementContract.Order memory order,
+        bytes32[] memory proof,
+        bytes32 root
+    ) internal view returns (bool) {
+        bytes32 leaf = verifier.hashOrder(order);
+        return MerkleProof.verify(proof, root, leaf);
     }
 
     /// @notice Test using Rust-generated JSON data
@@ -18,34 +31,34 @@ contract OrderMerkleVerifierTest is Test {
         
         // Verify first order
         {
-            OrderMerkleVerifier.Order memory order = OrderMerkleVerifier.Order({
-                source_chain_id: uint64(vm.parseJsonUint(json, ".proofs[0].order.source_chain_id")),
-                destination_chain_id: uint64(vm.parseJsonUint(json, ".proofs[0].order.destination_chain_id")),
+            SettlementContract.Order memory order = SettlementContract.Order({
+                sourceChainId: uint64(vm.parseJsonUint(json, ".proofs[0].order.source_chain_id")),
+                destinationChainId: uint64(vm.parseJsonUint(json, ".proofs[0].order.destination_chain_id")),
                 receiver: vm.parseJsonAddress(json, ".proofs[0].order.receiver"),
                 amount: vm.parseJsonUint(json, ".proofs[0].order.amount"),
-                block_number: uint64(vm.parseJsonUint(json, ".proofs[0].order.block_number"))
+                blockNumber: uint64(vm.parseJsonUint(json, ".proofs[0].order.block_number"))
             });
             
             bytes32[] memory proof = new bytes32[](1);
             proof[0] = vm.parseJsonBytes32(json, ".proofs[0].proof[0]");
             
-            assertTrue(verifier.verifyOrder(order, proof, root), "Order 0 from JSON should be valid");
+            assertTrue(verifyOrder(order, proof, root), "Order 0 from JSON should be valid");
         }
         
         // Verify second order
         {
-            OrderMerkleVerifier.Order memory order = OrderMerkleVerifier.Order({
-                source_chain_id: uint64(vm.parseJsonUint(json, ".proofs[1].order.source_chain_id")),
-                destination_chain_id: uint64(vm.parseJsonUint(json, ".proofs[1].order.destination_chain_id")),
+            SettlementContract.Order memory order = SettlementContract.Order({
+                sourceChainId: uint64(vm.parseJsonUint(json, ".proofs[1].order.source_chain_id")),
+                destinationChainId: uint64(vm.parseJsonUint(json, ".proofs[1].order.destination_chain_id")),
                 receiver: vm.parseJsonAddress(json, ".proofs[1].order.receiver"),
                 amount: vm.parseJsonUint(json, ".proofs[1].order.amount"),
-                block_number: uint64(vm.parseJsonUint(json, ".proofs[1].order.block_number"))
+                blockNumber: uint64(vm.parseJsonUint(json, ".proofs[1].order.block_number"))
             });
             
             bytes32[] memory proof = new bytes32[](1);
             proof[0] = vm.parseJsonBytes32(json, ".proofs[1].proof[0]");
             
-            assertTrue(verifier.verifyOrder(order, proof, root), "Order 1 from JSON should be valid");
+            assertTrue(verifyOrder(order, proof, root), "Order 1 from JSON should be valid");
         }
         
         console.log("Successfully verified all Rust-generated proofs from JSON!");
@@ -57,20 +70,20 @@ contract OrderMerkleVerifierTest is Test {
     /// @dev This test verifies the Merkle tree construction matches expectations
     function test_VerifyMerkleProof() public view {
         // Create test orders
-        OrderMerkleVerifier.Order memory order1 = OrderMerkleVerifier.Order({
-            source_chain_id: 2,
-            destination_chain_id: 1,
+        SettlementContract.Order memory order1 = SettlementContract.Order({
+            sourceChainId: 2,
+            destinationChainId: 1,
             receiver: 0x797b212C0a4cB61DEC7dC491B632b72D854e03fd,
             amount: 273418440000000000,
-            block_number: 9451455
+            blockNumber: 9451455
         });
 
-        OrderMerkleVerifier.Order memory order2 = OrderMerkleVerifier.Order({
-            source_chain_id: 1,
-            destination_chain_id: 2,
+        SettlementContract.Order memory order2 = SettlementContract.Order({
+            sourceChainId: 1,
+            destinationChainId: 2,
             receiver: 0x1234567890123456789012345678901234567890,
             amount: 100000000000000000,
-            block_number: 1000000
+            blockNumber: 1000000
         });
 
         // For a tree with 2 leaves, each leaf's proof contains the other leaf
@@ -93,7 +106,7 @@ contract OrderMerkleVerifierTest is Test {
         proof1[0] = leaf2;
 
         // Verify order1
-        bool valid1 = verifier.verifyOrder(order1, proof1, root);
+        bool valid1 = verifyOrder(order1, proof1, root);
         assertTrue(valid1, "Order 1 should be valid");
 
         // Create proof for order2 (proof contains leaf1)
@@ -101,18 +114,18 @@ contract OrderMerkleVerifierTest is Test {
         proof2[0] = leaf1;
 
         // Verify order2
-        bool valid2 = verifier.verifyOrder(order2, proof2, root);
+        bool valid2 = verifyOrder(order2, proof2, root);
         assertTrue(valid2, "Order 2 should be valid");
     }
 
     /// @notice Test invalid proof rejection
     function test_RejectInvalidProof() public view {
-        OrderMerkleVerifier.Order memory order = OrderMerkleVerifier.Order({
-            source_chain_id: 2,
-            destination_chain_id: 1,
+        SettlementContract.Order memory order = SettlementContract.Order({
+            sourceChainId: 2,
+            destinationChainId: 1,
             receiver: 0x797b212C0a4cB61DEC7dC491B632b72D854e03fd,
             amount: 273418440000000000,
-            block_number: 9451455
+            blockNumber: 9451455
         });
 
         bytes32[] memory invalidProof = new bytes32[](1);
@@ -120,7 +133,7 @@ contract OrderMerkleVerifierTest is Test {
         
         bytes32 fakeRoot = bytes32(uint256(789012));
 
-        bool valid = verifier.verifyOrder(order, invalidProof, fakeRoot);
+        bool valid = verifyOrder(order, invalidProof, fakeRoot);
         assertFalse(valid, "Invalid proof should be rejected");
     }
 
@@ -136,12 +149,12 @@ contract OrderMerkleVerifierTest is Test {
         for (uint i = 0; i < 3; i++) {
             string memory basePath = string.concat(".proofs[", vm.toString(i), "]");
             
-            OrderMerkleVerifier.Order memory order = OrderMerkleVerifier.Order({
-                source_chain_id: uint64(vm.parseJsonUint(json, string.concat(basePath, ".order.source_chain_id"))),
-                destination_chain_id: uint64(vm.parseJsonUint(json, string.concat(basePath, ".order.destination_chain_id"))),
+            SettlementContract.Order memory order = SettlementContract.Order({
+                sourceChainId: uint64(vm.parseJsonUint(json, string.concat(basePath, ".order.source_chain_id"))),
+                destinationChainId: uint64(vm.parseJsonUint(json, string.concat(basePath, ".order.destination_chain_id"))),
                 receiver: vm.parseJsonAddress(json, string.concat(basePath, ".order.receiver")),
                 amount: vm.parseJsonUint(json, string.concat(basePath, ".order.amount")),
-                block_number: uint64(vm.parseJsonUint(json, string.concat(basePath, ".order.block_number")))
+                blockNumber: uint64(vm.parseJsonUint(json, string.concat(basePath, ".order.block_number")))
             });
             
             // Parse proof array
@@ -149,7 +162,7 @@ contract OrderMerkleVerifierTest is Test {
             proof[0] = vm.parseJsonBytes32(json, string.concat(basePath, ".proof[0]"));
             proof[1] = vm.parseJsonBytes32(json, string.concat(basePath, ".proof[1]"));
             
-            bool valid = verifier.verifyOrder(order, proof, root);
+            bool valid = verifyOrder(order, proof, root);
             assertTrue(valid, string.concat("Order ", vm.toString(i), " should be valid"));
         }
         
@@ -168,12 +181,12 @@ contract OrderMerkleVerifierTest is Test {
         for (uint i = 0; i < 5; i++) {
             string memory basePath = string.concat(".proofs[", vm.toString(i), "]");
             
-            OrderMerkleVerifier.Order memory order = OrderMerkleVerifier.Order({
-                source_chain_id: uint64(vm.parseJsonUint(json, string.concat(basePath, ".order.source_chain_id"))),
-                destination_chain_id: uint64(vm.parseJsonUint(json, string.concat(basePath, ".order.destination_chain_id"))),
+            SettlementContract.Order memory order = SettlementContract.Order({
+                sourceChainId: uint64(vm.parseJsonUint(json, string.concat(basePath, ".order.source_chain_id"))),
+                destinationChainId: uint64(vm.parseJsonUint(json, string.concat(basePath, ".order.destination_chain_id"))),
                 receiver: vm.parseJsonAddress(json, string.concat(basePath, ".order.receiver")),
                 amount: vm.parseJsonUint(json, string.concat(basePath, ".order.amount")),
-                block_number: uint64(vm.parseJsonUint(json, string.concat(basePath, ".order.block_number")))
+                blockNumber: uint64(vm.parseJsonUint(json, string.concat(basePath, ".order.block_number")))
             });
             
             // Parse proof array (3 elements for a tree with 5 leaves)
@@ -182,7 +195,7 @@ contract OrderMerkleVerifierTest is Test {
             proof[1] = vm.parseJsonBytes32(json, string.concat(basePath, ".proof[1]"));
             proof[2] = vm.parseJsonBytes32(json, string.concat(basePath, ".proof[2]"));
             
-            bool valid = verifier.verifyOrder(order, proof, root);
+            bool valid = verifyOrder(order, proof, root);
             assertTrue(valid, string.concat("Order ", vm.toString(i), " should be valid"));
         }
         

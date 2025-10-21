@@ -41,5 +41,5 @@ pub fn main() {
     let root = generate_merkle_root(orders.as_slice());
     println!("Verification Root: {root:?}");
 
-    sp1_zkvm::io::commit(&root);
+    sp1_zkvm::io::commit_slice(root.as_slice());
 }

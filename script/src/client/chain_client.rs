@@ -63,6 +63,7 @@ pub enum Chain {
     BaseSepolia,
     ArbitrumSepolia,
     SolanaDevnet,
+    StarknetSepolia,
 }
 
 impl Chain {
@@ -71,8 +72,9 @@ impl Chain {
             "base-sepolia" | "base" => Ok(Chain::BaseSepolia),
             "arbitrum-sepolia" | "arbitrum" | "arb" => Ok(Chain::ArbitrumSepolia),
             "solana-devnet" | "solana" => Ok(Chain::SolanaDevnet),
+            "starknet-sepolia" | "starknet" => Ok(Chain::StarknetSepolia),
             _ => Err(format!(
-                "Unknown chain: {name}. Supported: base-sepolia, arbitrum-sepolia, solana-devnet"
+                "Unknown chain: {name}. Supported: base-sepolia, arbitrum-sepolia, solana-devnet, starknet-sepolia"
             )),
         }
     }
@@ -82,6 +84,7 @@ impl Chain {
             Chain::BaseSepolia => 84532,
             Chain::ArbitrumSepolia => 421614,
             Chain::SolanaDevnet => 103,
+            Chain::StarknetSepolia => 393402133025997798, // Numeric representation for Starknet Sepolia
         }
     }
 
@@ -90,6 +93,7 @@ impl Chain {
             Chain::BaseSepolia => "Base Sepolia",
             Chain::ArbitrumSepolia => "Arbitrum Sepolia",
             Chain::SolanaDevnet => "Solana Devnet",
+            Chain::StarknetSepolia => "Starknet Sepolia",
         }
     }
 
@@ -101,11 +105,16 @@ impl Chain {
         matches!(self, Chain::SolanaDevnet)
     }
 
+    pub fn is_starknet(&self) -> bool {
+        matches!(self, Chain::StarknetSepolia)
+    }
+
     fn rpc_url(&self) -> Result<String, String> {
         let env_var = match self {
             Chain::BaseSepolia => "BASE_SEPOLIA_RPC",
             Chain::ArbitrumSepolia => "ARB_SEPOLIA_RPC",
             Chain::SolanaDevnet => "SOLANA_DEVNET_RPC",
+            Chain::StarknetSepolia => "STARKNET_SEPOLIA_RPC",
         };
         std::env::var(env_var).map_err(|_| format!("{env_var} environment variable not set"))
     }
@@ -115,6 +124,7 @@ impl Chain {
             Chain::BaseSepolia => "BASE_SEPOLIA_CONTRACT",
             Chain::ArbitrumSepolia => "ARB_SEPOLIA_CONTRACT",
             Chain::SolanaDevnet => "SOLANA_DEVNET_PROGRAM",
+            Chain::StarknetSepolia => "STARKNET_SEPOLIA_CONTRACT",
         };
         std::env::var(env_var).map_err(|_| format!("{env_var} environment variable not set"))
     }

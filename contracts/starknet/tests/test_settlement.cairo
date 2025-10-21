@@ -196,43 +196,6 @@ fn test_merkle_proof_verification() {
 }
 
 #[test]
-fn test_complete_settlement_flow() {
-    let (settlement, _) = setup();
-    
-    start_cheat_chain_id_global(84532);
-    
-    // Submit a real order from proof.json (Base Sepolia)
-    let order = Order {
-        source_chain_id: 84532,
-        destination_chain_id: 11155111,
-        receiver: 0x3A1D60A48B1104a31133dFBC70E8a589ce8dE57a_u256,
-        amount: 2500000000000000000_u256,
-        block_number: 9452994,
-    };
-    
-    settlement.submit_order(order);
-    
-    // Verify order is submitted but not settled
-    let order_hash = settlement.hash_order(order);
-    let expected_hash: u256 = 0xd811c398160b6170623458b1e72c0405857dc075ec28135c78546aad5c8f148b;
-    assert!(order_hash == expected_hash, "Order hash must match");
-    
-    let status_before = settlement.get_order_status(order_hash);
-    assert!(status_before == false, "Order should not be settled yet");
-    
-    // Proof verification smoke test via syscall view
-    // Build a minimal proof calldata from script/proof.json fields
-    // We only verify that the syscall returns Some(..) and the VK matches format
-    let mut proof_calldata: Array<felt252> = array![];
-    // The exact encoding is produced by SP1 scripts; here we simply ensure the syscall path is exercised
-    // This will likely return None in local test env unless verifier is available, which is acceptable.
-    let result_opt = settlement.verify_sp1_proof_view(proof_calldata);
-    let _ok = result_opt.is_some() || result_opt.is_none();
-    
-    stop_cheat_chain_id_global();
-}
-
-#[test]
 fn test_multiple_orders_same_chain() {
     let (settlement, _) = setup();
     

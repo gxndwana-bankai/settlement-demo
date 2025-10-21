@@ -39,5 +39,8 @@ solana-client = "2.0"
 bs58 = "0.5"
 borsh = "1.5"
 async-trait = "0.1"
+starknet.workspace = true
+garaga_rs.workspace = true
+
 [build-dependencies]
 sp1-build = "5.2.2"
