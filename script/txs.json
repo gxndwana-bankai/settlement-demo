@@ -160,7 +160,7 @@
         "tx_hash": "0xa9c13d105dd2faedd4f02744cdf1a82d1239333b8de03462d0e4869e61492a7f"
     },
     {
-        "source_chain_id": 84532,
+        "source_chain_id": 103,
         "destination_chain_id": 11155111,
         "receiver": "0xaEcaBbc487b21fa0BC0BF1586fc49b050864DCf9",
         "amount": "2500000000000000000",
@@ -168,7 +168,7 @@
         "tx_hash": "0xd3e34ee6115837640066f239c4b51ca2d7a5995613c8f5b684b68eb55bbf3a51"
     },
     {
-        "source_chain_id": 84532,
+        "source_chain_id": 103,
         "destination_chain_id": 11155111,
         "receiver": "0x908318c2cEf4ed683c4d76953F6F3a202157DFDc",
         "amount": "2405592970000000000",

@@ -1,4 +1,4 @@
-use alloy_primitives::{hex, keccak256, FixedBytes};
+use alloy_primitives::{keccak256, FixedBytes};
 use alloy_sol_types::{sol, SolType};
 use serde::{Deserialize, Serialize};
 

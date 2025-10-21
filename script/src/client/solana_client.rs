@@ -258,6 +258,14 @@ impl ChainClient for SolanaClient {
 
             let (order_pda, _) = self.get_order_pda(&order_hash);
 
+            // Check if order already exists
+            if let Ok(account) = self.rpc_client.get_account(&order_pda) {
+                if account.lamports > 0 {
+                    println!("   ⏭️  Order already submitted, skipping\n");
+                    continue;
+                }
+            }
+
             if dry_run {
                 println!("   ✅ Dry run - transaction prepared\n");
                 continue;
@@ -396,52 +404,69 @@ impl ChainClient for SolanaClient {
             return Ok(());
         }
 
-        let discriminator = get_discriminator("global", "settle_orders");
-        let mut instruction_data = Vec::new();
-        instruction_data.extend_from_slice(&discriminator);
-        instruction_data.extend_from_slice(&borsh::to_vec(&sp1_public_inputs)?);
-        instruction_data.extend_from_slice(&borsh::to_vec(&groth16_proof)?);
-        instruction_data.extend_from_slice(&borsh::to_vec(&order_proofs)?);
+        // Settle orders one by one to avoid transaction size limits
+        let total_orders = order_proofs.len();
 
-        let (state_pda, _) = self.get_state_pda();
-
-        let mut accounts = vec![AccountMeta::new(state_pda, false)];
-
-        for op in &order_proofs {
-            let (order_pda, _) = self.get_order_pda(&op.order_hash);
-            accounts.push(AccountMeta::new(order_pda, false));
+        if total_orders > 1 {
+            println!("⚠️  Settling orders individually to stay within transaction size limits\n");
         }
 
-        let settle_instruction = Instruction {
-            program_id: self.program_id,
-            accounts,
-            data: instruction_data,
-        };
+        for (i, order_proof) in order_proofs.iter().enumerate() {
+            println!(
+                "📦 [{}/{}] Settling order 0x{}...",
+                i + 1,
+                total_orders,
+                hex::encode(&order_proof.order_hash[..4])
+            );
 
-        // Add compute budget instruction to increase compute units for proof verification
-        let compute_budget_ix = ComputeBudgetInstruction::set_compute_unit_limit(1_400_000);
+            let discriminator = get_discriminator("global", "settle_orders");
+            let mut instruction_data = Vec::new();
+            instruction_data.extend_from_slice(&discriminator);
+            instruction_data.extend_from_slice(&borsh::to_vec(&sp1_public_inputs)?);
+            instruction_data.extend_from_slice(&borsh::to_vec(&groth16_proof)?);
+            instruction_data.extend_from_slice(&borsh::to_vec(&vec![order_proof.clone()])?);
 
-        println!("📤 Sending transaction...");
-        println!("   Using increased compute budget: 1,400,000 units");
+            let (state_pda, _) = self.get_state_pda();
+            let (order_pda, _) = self.get_order_pda(&order_proof.order_hash);
 
-        let recent_blockhash = self.rpc_client.get_latest_blockhash()?;
-        let transaction = SolanaTransaction::new_signed_with_payer(
-            &[compute_budget_ix, settle_instruction],
-            Some(&self.keypair.pubkey()),
-            &[&self.keypair],
-            recent_blockhash,
+            let accounts = vec![
+                AccountMeta::new(state_pda, false),
+                AccountMeta::new(order_pda, false),
+            ];
+
+            let settle_instruction = Instruction {
+                program_id: self.program_id,
+                accounts,
+                data: instruction_data,
+            };
+
+            let compute_budget_ix = ComputeBudgetInstruction::set_compute_unit_limit(1_400_000);
+
+            let recent_blockhash = self.rpc_client.get_latest_blockhash()?;
+            let transaction = SolanaTransaction::new_signed_with_payer(
+                &[compute_budget_ix, settle_instruction],
+                Some(&self.keypair.pubkey()),
+                &[&self.keypair],
+                recent_blockhash,
+            );
+
+            match self.rpc_client.send_and_confirm_transaction(&transaction) {
+                Ok(signature) => {
+                    println!("   Tx: {signature}");
+                    println!("   ✅ Success\n");
+                }
+                Err(e) => {
+                    println!("   ❌ Failed: {e}\n");
+                    return Err(e.into());
+                }
+            }
+        }
+
+        println!(
+            "✅ All {} order{} settled successfully!",
+            total_orders,
+            if total_orders == 1 { "" } else { "s" }
         );
-
-        match self.rpc_client.send_and_confirm_transaction(&transaction) {
-            Ok(signature) => {
-                println!("   Tx signature: {signature}");
-                println!("\n✅ Settlement successful!");
-            }
-            Err(e) => {
-                println!("\n❌ Transaction failed: {e}");
-                return Err(e.into());
-            }
-        }
 
         Ok(())
     }
@@ -495,7 +520,10 @@ impl ChainClient for SolanaClient {
 
         let (state_pda, _) = self.get_state_pda();
 
-        let mut accounts = vec![AccountMeta::new(state_pda, false)];
+        let mut accounts = vec![
+            AccountMeta::new(state_pda, false),
+            AccountMeta::new(self.keypair.pubkey(), true),
+        ];
 
         for order_hash in &order_hashes {
             let (order_pda, _) = self.get_order_pda(order_hash);

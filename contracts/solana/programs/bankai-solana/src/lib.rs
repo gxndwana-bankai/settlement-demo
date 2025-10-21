@@ -111,13 +111,25 @@ pub mod bankai_solana {
                 Pubkey::find_program_address(&[b"order", h.as_ref()], ctx.program_id);
             require_keys_eq!(expected_pda, *acct_info.key);
 
-            let mut data: state::OrderStatus =
-                state::OrderStatus::try_deserialize(&mut &acct_info.data.borrow()[..])?;
-            require!(data.order_hash == *h, SettlementError::InvalidOrderHash);
-            data.settled = false;
+            // Try to deserialize and validate, but allow closing even if it fails
+            // This handles corrupted accounts or accounts without proper discriminator
+            if acct_info.data.borrow().len() >= 8 {
+                if let Ok(data) =
+                    state::OrderStatus::try_deserialize(&mut &acct_info.data.borrow()[..])
+                {
+                    require!(data.order_hash == *h, SettlementError::InvalidOrderHash);
+                }
+            }
+
+            // Close the account by transferring lamports to payer and clearing data
+            let dest_starting_lamports = ctx.accounts.payer.lamports();
+            **ctx.accounts.payer.lamports.borrow_mut() = dest_starting_lamports
+                .checked_add(acct_info.lamports())
+                .unwrap();
+            **acct_info.lamports.borrow_mut() = 0;
+
             let mut data_buf = acct_info.data.borrow_mut();
-            let mut cursor = std::io::Cursor::new(&mut data_buf[..]);
-            data.try_serialize(&mut cursor)?;
+            data_buf.fill(0);
         }
         Ok(())
     }
@@ -228,4 +240,6 @@ pub struct SettleOrders<'info> {
 pub struct ResetOrders<'info> {
     #[account(mut, seeds = [b"state"], bump = state.bump)]
     pub state: Account<'info, SettlementState>,
+    #[account(mut)]
+    pub payer: Signer<'info>,
 }
