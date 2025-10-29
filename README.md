@@ -24,7 +24,7 @@ This project mocks that flow:
 
 The settlement mechanism is enabled by Bankai's stateless light clients.
 
-Instead of maintaining a stateful light client on each source chain, Bankai uses ZK recursion to generate a single, constant-sized proof of Ethereum's history. This proof is synced entirely off-chain and acts as a portable, self-contained certificate of the canonical chain.
+Instead of maintaining a stateful light client on each source chains (Arbitrum, Base, Starknet, Solana), Bankai uses ZK recursion to generate a single, constant-sized proof of Ethereum's history. This proof is synced entirely off-chain and acts as a portable, self-contained certificate of the canonical chain.
 
 Verification is performed on-demand by submitting this proof to a standard, stateless `Groth16` verifier contract. This eliminates the need for setting up a dedicated light client deployment on each source chain, creating cost, complexity and perpetual onchain cost. Deploy the verifier contract, and access all light clients available in Bankai.
 
