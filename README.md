@@ -10,7 +10,7 @@ The core of this demo is to showcase how this stateless approach enables a singl
 
 ## The Settlement Architecture
 
-In an intent-based protocol, users state their desired outcome, and solvers execute the necessary transactions. A critical component is the settlement layer, which must trustlessly verify that a solver's execution on a destination chain (e.g., Ethereum L1) matches the user's intent before releasing the user's funds on a source chain (e.g., Arbitrum).
+In an intent-based protocol, users state their desired outcome, and solvers execute the necessary transactions. A critical component is the settlement mechanism, which must trustlessly verify that a solver's execution on a destination chain (e.g., Ethereum L1) matches the user's intent before releasing the user's funds on a source chain (e.g., Arbitrum).
 
 This project mocks that flow:
 
