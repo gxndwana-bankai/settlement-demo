@@ -7,7 +7,7 @@ use merkle::verify_merkle_proof_keccak;
 use state::*;
 
 declare_id!("HpgNxwdekXixEW6ZzTPsjhhFx46fpfoC7ruJvsinPYHx");
-const BANKAI_VKEY_HASH: &str = "0x003d29a51a01c697e8de906c75c27852dbd2340ba91ae2f033c64a3e8f0228c5";
+const BANKAI_VKEY_HASH: &str = "0x009c661e44c7e5e76f0aafdfab8ceb7c76357cc5ba5863a7dfa0b306807f8c02";
 #[program]
 pub mod bankai_solana {
     use super::*;

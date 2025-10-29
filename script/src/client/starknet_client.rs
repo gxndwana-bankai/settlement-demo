@@ -14,6 +14,7 @@ use starknet::{
     signers::{LocalWallet, SigningKey},
 };
 use std::str::FromStr;
+use std::time::Duration;
 
 pub struct StarknetClient {
     config: ChainConfig,
@@ -51,7 +52,7 @@ impl StarknetClient {
 
     fn generate_proof_calldata(
         &self,
-        proof_data: &ProofData,
+        _proof_data: &ProofData,
     ) -> Result<Vec<Felt>, Box<dyn std::error::Error>> {
         println!("🔧 Generating proof calldata on the fly with Garaga...");
 
@@ -187,14 +188,9 @@ impl ChainClient for StarknetClient {
                 calldata,
             };
 
-            match account
-                .execute_v3(vec![call])
-                .l1_gas(2_000_000u64)
-                .l1_gas_price(1_000_000_000u128)
-                .send()
-                .await
-            {
+            match account.execute_v3(vec![call]).send().await {
                 Ok(result) => {
+                    tokio::time::sleep(Duration::from_secs(5)).await;
                     println!("   Tx hash: {:#064x}", result.transaction_hash);
                     println!("   ✅ Success\n");
                 }

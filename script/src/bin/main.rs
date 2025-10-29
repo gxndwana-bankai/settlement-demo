@@ -167,10 +167,6 @@ async fn main() {
             .expect("Failed to write to file");
 
         println!("Successfully generated proof!");
-
-        // Verify the proof.
-        client.verify(&proof, &vk).expect("failed to verify proof");
-        println!("Successfully verified proof!");
     }
 }
 

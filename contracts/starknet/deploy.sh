@@ -3,7 +3,7 @@ set -e
 
 NETWORK="${1:-sepolia}"
 ACCOUNT="${2:-}"
-VK="${3:-0x003d29a51a01c697e8de906c75c27852dbd2340ba91ae2f033c64a3e8f0228c5}"
+VK="${3:-0x009c661e44c7e5e76f0aafdfab8ceb7c76357cc5ba5863a7dfa0b306807f8c02}"
 
 if [ -z "$ACCOUNT" ]; then
     echo "Error: Account name required"
