@@ -2,7 +2,17 @@
 
 This repository contains a demonstration of a trustless settlement mechanism for an intent-based protocol. It uses [Bankai's](https://www.bankai.xyz) stateless light clients to verify Ethereum L1 state on various source chains (EVM L2s, Solana, Starknet) and [SP1](https://succinct.xyz) to create a verifiable computation of the settlement logic.
 
-The key advantage of this stateless design is the elimination of dedicated, stateful light client contracts. Instead of deploying, maintaining, and perpetually syncing a complex contract on each target chain, this architecture relies on a simple, standard `Groth16` verifier. The verification logic can be exposed as a simple `view` function, making it easy and cheap to integrate while completely removing the burden of on-chain state management and ongoing synchronization costs.
+To trustlessly prove that a transaction was executed on a source chain, protocols typically rely on on-chain light clients. However, traditional light clients (like those used in bridges) require a dedicated contract deployment on each chain and perpetual on-chain transactions to keep them synced with the latest block headers. This approach introduces significant cost and complexity for each deployment, whether it's actively used or not.
+
+Stateless light clients fundamentally change this model. All syncing operations happen off-chain using efficient ZK recursion. To access the light client's state on-chain, a user simply verifies a constant-sized `Groth16` proof. This verification is done on-demand through a standard, pre-deployed `Groth16` verifier contract. As a result, there are no perpetual on-chain costs, and developers only pay for verification when they need to access data. This makes cross-chain state access simple, cheap, and universally available.
+
+The core of this demo is to showcase how this stateless approach enables a single, universal ZK proof to settle transactions across multiple chains, without requiring expensive, stateful on-chain light client infrastructure.
+
+## The Settlement Architecture
+
+In an intent-based protocol, users state their desired outcome, and solvers execute the necessary transactions. A critical component is the settlement layer, which must trustlessly verify that a solver's execution on a destination chain (e.g., Ethereum L1) matches the user's intent before releasing the user's funds on a source chain (e.g., Arbitrum).
+
+This project mocks that flow:
 
 ## The Settlement Architecture
 
