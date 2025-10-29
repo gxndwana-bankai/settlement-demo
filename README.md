@@ -85,7 +85,6 @@ Bankai's stateless design is a foundational technology for the future of interop
 *   **Effortless Access to Light Client Data**: Bankai's architecture simplifies how developers access cross-chain data, abstracting away the complexity of traditional light clients.
 *   **Roadmap to Full Coverage**: The network currently supports Ethereum L1, with major L2s coming soon, followed by other L1s.
 *   **A Universal Light Client Layer**: The goal is to provide trustless, on-demand access to a wide variety of chains.
-* 
 
 ## Project Components
 
