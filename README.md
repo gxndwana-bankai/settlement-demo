@@ -13,9 +13,9 @@ Bankai vs. today's trustless solutions (current ZK light clients)
 
 ## Explanation
 
-This repository contains a demonstration of a trustless settlement mechanism for an intent-based protocol. It uses [Bankai's](https://www.bankai.xyz) stateless light clients to verify Ethereum L1 state on various source chains (EVM L2s, Solana, Starknet) and [SP1](https://succinct.xyz) to create a verifiable computation of the settlement logic.
+This repository contains a demonstration of a trustless settlement mechanism for an intent-based protocol. It uses [Bankai's](https://www.bankai.xyz) stateless light clients to verify Ethereum L1 transactions on various source chains (EVM L2s, Solana, Starknet) and [SP1](https://succinct.xyz) to create a verifiable computation of the settlement logic.
 
-To trustlessly prove that a transaction was executed on a source chain, protocols can rely on on-chain light clients. However, traditional light clients (e.g. SP1 Helios) require a dedicated contract deployment on each chain and perpetual on-chain transactions to keep them synced with the latest block headers. This approach introduces significant cost and complexity for each deployment, whether it's actively used or not.
+To trustlessly prove that a transaction was executed on a destination chain, protocols can rely on on-chain light clients. However, traditional light clients (e.g. SP1 Helios) require a dedicated contract deployment on each chain and perpetual on-chain transactions to keep them synced with the latest block headers. This approach introduces significant cost and complexity for each deployment, whether it's actively used or not.
 
 Stateless light clients fundamentally change this model. All syncing operations happen off-chain using efficient ZK recursion. To access the light client's state on-chain, a user simply verifies a constant-sized `Groth16` proof. This verification is done on-demand through a standard, pre-deployed `Groth16` verifier contract. As a result, there are no perpetual on-chain costs, and developers only pay for verification when they need to access data. This makes cross-chain state access simple, cheap, and universally available.
 
