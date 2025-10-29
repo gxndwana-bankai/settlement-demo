@@ -62,7 +62,16 @@ The settlement process is divided into off-chain data preparation, zkVM computat
 
 ![Data Flow](resources/flow.png)
 
-The key takeaway from this data flow is the creation of a universal settlement layer. The final `Groth16` proof is a self-contained, portable certificate of execution that can be verified on any chain with a standard verifier contract. No chain-specific infrastructure needs to be deployed or maintained in a synced state. This is the core advantage enabled by the stateless light client design: it makes trustless cross-chain state verification simple, cheap, and universally accessible. The core promise of Bankai is that any light client integrated into the network can be accessed on any chain through this single, standardized verifier. While this demo uses an Ethereum L1 light client, Bankai is expanding to include common L2s and other L1s. This will enable developers to create complex, multi-chain settlement programs (like this one) that can trustlessly verify state from any supported chain, all through a single SP1 program and a standard on-chain verifier.
+The key takeaway from this data flow is the creation of a universal settlement layer. The final `Groth16` proof is a self-contained, portable certificate of execution that can be verified on any chain with a standard verifier contract. No chain-specific infrastructure needs to be deployed or maintained in a synced state. This powerful primitive, enabled by the stateless light client design, is the foundation for a much broader vision for interoperability.
+
+## The Vision: A Universal Interoperability Layer
+
+Bankai's stateless design is a foundational technology for the future of interoperability. The key takeaway is the creation of a universal, trustless light client layer.
+
+*   **Effortless Access to Light Client Data**: Bankai's architecture simplifies how developers access cross-chain data, abstracting away the complexity of traditional light clients.
+*   **Roadmap to Full Coverage**: The network currently supports Ethereum L1, with major L2s coming soon, followed by other L1s.
+*   **A Universal Light Client Layer**: The goal is to provide trustless, on-demand access to a wide variety of chains.
+* 
 
 ## Project Components
 
