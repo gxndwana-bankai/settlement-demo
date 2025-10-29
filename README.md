@@ -56,7 +56,7 @@ The settlement process is divided into off-chain data preparation, zkVM computat
 
 ![Data Flow](resources/flow.png)
 
-The key takeaway from this data flow is the creation of a universal settlement layer. The final `Groth16` proof is a self-contained, portable certificate of execution that can be verified on any chain with a standard verifier contract. No chain-specific infrastructure needs to be deployed or maintained in a synced state. This is the core advantage enabled by the stateless light client design: it makes trustless cross-chain state verification simple, cheap, and universally accessible.
+The final `Groth16` proof is a self-contained, portable certificate of execution that can be verified on any chain with a standard verifier contract. No chain-specific infrastructure needs to be deployed, maintained and kept in sync using onchain TXs. This is the core advantage enabled by the stateless light client design: it makes trustless cross-chain state verification simple, cheap, and universally accessible.
 
 ## Project Components
 
