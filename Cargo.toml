@@ -12,9 +12,10 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace.dependencies]
-bankai-sdk = { git = "https://github.com/bankaixyz/bankai-sdk", package = "bankai-sdk", rev = "76c9b968b03fff7b8a800e1f0ff62744e881baed" }
-bankai-types = { git = "https://github.com/bankaixyz/bankai-sdk", package = "bankai-types", rev = "76c9b968b03fff7b8a800e1f0ff62744e881baed", default-features = false, features = ["verifier-types"] }
-bankai-verify = { git = "https://github.com/bankaixyz/bankai-sdk", package = "bankai-verify", rev = "76c9b968b03fff7b8a800e1f0ff62744e881baed", default-features = false }
+bankai-sdk = { git = "https://github.com/bankaixyz/bankai-sdk", package = "bankai-sdk", rev = "e6123357f5322feba9560aa0ed1b275c228ae4fb" }
+bankai-types = { git = "https://github.com/bankaixyz/bankai-sdk", package = "bankai-types", rev = "e6123357f5322feba9560aa0ed1b275c228ae4fb", default-features = false, features = ["verifier-types"] }
+bankai-verify = { git = "https://github.com/bankaixyz/bankai-sdk", package = "bankai-verify", rev = "e6123357f5322feba9560aa0ed1b275c228ae4fb", default-features = false }
+
 sp1-sdk = "5.2.2"
 sp1-zkvm = "5.2.2"
 

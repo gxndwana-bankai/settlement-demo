@@ -16,16 +16,12 @@ use settlement_lib::{generate_merkle_root, Order};
 pub fn main() {
     // Read an input to the program.
     println!("Entering zkVM...");
-    let json_bytes = sp1_zkvm::io::read_vec();
-    let proof_batch: ProofWrapper =
-        serde_json::from_slice(&json_bytes).expect("JSON deserialization failed");
-
+    let proof_batch = sp1_zkvm::io::read::<ProofWrapper>();
     let orders = sp1_zkvm::io::read::<Vec<Order>>();
-
     println!("Retrieved Inputs...");
 
     // verify the proof, containing all the claimed executions
-    let res = verify_batch_proof(&proof_batch).unwrap();
+    let res = verify_batch_proof(proof_batch).unwrap();
 
     // iterate throught the orders, asserting they match the veried txs
     for (index, order) in orders.iter().enumerate() {

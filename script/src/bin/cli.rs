@@ -39,7 +39,6 @@ struct Cli {
     )]
     solana_private_key: Option<String>,
 
-
     /// Dry run mode - don't actually send transactions
     #[arg(long, global = true)]
     dry_run: bool,
@@ -93,6 +92,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 for chain in [
                     Chain::BaseSepolia,
                     Chain::ArbitrumSepolia,
+                    Chain::SolanaDevnet,
                     Chain::StarknetSepolia,
                 ] {
                     match create_client(chain, &cli) {
@@ -160,8 +160,6 @@ fn create_client(
                 solana_private_key.clone(),
             )?))
         }
-        Chain::StarknetSepolia => {
-            Ok(Box::new(StarknetClient::new(config)?))
-        }
+        Chain::StarknetSepolia => Ok(Box::new(StarknetClient::new(config)?)),
     }
 }

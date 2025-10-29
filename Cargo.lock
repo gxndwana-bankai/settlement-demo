@@ -279,6 +279,7 @@ dependencies = [
  "alloy-rlp",
  "k256",
  "serde",
+ "serde_with 3.15.0",
  "thiserror 2.0.17",
 ]
 
@@ -1815,7 +1816,7 @@ dependencies = [
 [[package]]
 name = "bankai-sdk"
 version = "0.1.0"
-source = "git+https://github.com/bankaixyz/bankai-sdk?rev=76c9b968b03fff7b8a800e1f0ff62744e881baed#76c9b968b03fff7b8a800e1f0ff62744e881baed"
+source = "git+https://github.com/bankaixyz/bankai-sdk?rev=e6123357f5322feba9560aa0ed1b275c228ae4fb#e6123357f5322feba9560aa0ed1b275c228ae4fb"
 dependencies = [
  "accumulators",
  "alloy-primitives",
@@ -1846,7 +1847,7 @@ dependencies = [
 [[package]]
 name = "bankai-types"
 version = "0.1.0"
-source = "git+https://github.com/bankaixyz/bankai-sdk?rev=76c9b968b03fff7b8a800e1f0ff62744e881baed#76c9b968b03fff7b8a800e1f0ff62744e881baed"
+source = "git+https://github.com/bankaixyz/bankai-sdk?rev=e6123357f5322feba9560aa0ed1b275c228ae4fb#e6123357f5322feba9560aa0ed1b275c228ae4fb"
 dependencies = [
  "alloy-consensus",
  "alloy-primitives",
@@ -1866,7 +1867,7 @@ dependencies = [
 [[package]]
 name = "bankai-verify"
 version = "0.1.0"
-source = "git+https://github.com/bankaixyz/bankai-sdk?rev=76c9b968b03fff7b8a800e1f0ff62744e881baed#76c9b968b03fff7b8a800e1f0ff62744e881baed"
+source = "git+https://github.com/bankaixyz/bankai-sdk?rev=e6123357f5322feba9560aa0ed1b275c228ae4fb#e6123357f5322feba9560aa0ed1b275c228ae4fb"
 dependencies = [
  "alloy-primitives",
  "alloy-rlp",

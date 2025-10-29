@@ -85,18 +85,15 @@ async fn main() {
 
     // Add evm transactions to the batch
     for order in orders.clone() {
-        bankai_batch = bankai_batch.evm_tx(order.1.tx_hash);
+        bankai_batch = bankai_batch.evm_tx(order.1.tx_hash.clone());
     }
 
     // Execute the batch, generating all proofs for the added transactions
     let batch_result = bankai_batch.execute().await.unwrap();
 
-    // Serialize the batch result to bytes
-    let proof_bytes = serde_json::to_vec(&batch_result).expect("JSON serialization failed");
-
     let orders: Vec<Order> = orders.iter().map(|(order, _)| order.clone()).collect();
     let mut stdin = SP1Stdin::new();
-    stdin.write_vec(proof_bytes);
+    stdin.write(&batch_result);
     stdin.write(&orders);
 
     if args.execute {
