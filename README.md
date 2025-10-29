@@ -1,3 +1,21 @@
+TL;DR: Use Bankai’s stateless light clients for trustless cross-chain settlement in intent-based protocols.
+
+Verify Ethereum L1 transactions (solver deposits) across various source chains (EVM L2s, Solana, Starknet) with a single Groth16 proof via SP1—pay only when you verify.
+
+Bankai vs. today's trustless solutions (current ZK light clients)
+
+- Less infra: No custom deployments per source chain
+- Lower cost: No perpetual on-chain syncing; on-demand Groth16 verification
+- Quick chain integration: Add new source chains by deploying a standard Groth16 verification contract
+
+
+
+
+
+
+
+
+
 # Bankai: Cross-Chain Settlement Demo
 
 This repository contains a demonstration of a trustless settlement mechanism for an intent-based protocol. It uses [Bankai's](https://www.bankai.xyz) stateless light clients to verify Ethereum L1 state on various source chains (EVM L2s, Solana, Starknet) and [SP1](https://succinct.xyz) to create a verifiable computation of the settlement logic.
