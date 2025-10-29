@@ -11,6 +11,7 @@ Bankai vs. today's trustless solutions (current ZK light clients)
 - **Quick chain integration:** Add new source chains by deploying a standard Groth16 verification contract
 
 
+## Explanation
 
 This repository contains a demonstration of a trustless settlement mechanism for an intent-based protocol. It uses [Bankai's](https://www.bankai.xyz) stateless light clients to verify Ethereum L1 state on various source chains (EVM L2s, Solana, Starknet) and [SP1](https://succinct.xyz) to create a verifiable computation of the settlement logic.
 
