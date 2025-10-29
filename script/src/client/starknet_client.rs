@@ -85,7 +85,7 @@ impl StarknetClient {
             .iter()
             .map(|bigint| {
                 let hex_str = format!("{:064x}", bigint.to_biguint());
-                Felt::from_hex(&format!("0x{}", hex_str)).unwrap()
+                Felt::from_hex(&format!("0x{hex_str}")).unwrap()
             })
             .collect();
 
@@ -147,7 +147,7 @@ impl ChainClient for StarknetClient {
             // Convert receiver address to u256 (low, high)
             // Ethereum address is 20 bytes, pad to 32 bytes for u256
             let receiver_hex = tx.receiver.trim_start_matches("0x");
-            let mut receiver_bytes = vec![0u8; 32];
+            let mut receiver_bytes = [0u8; 32];
             let addr_bytes = hex::decode(receiver_hex)?;
             receiver_bytes[32 - addr_bytes.len()..].copy_from_slice(&addr_bytes);
 
@@ -174,7 +174,7 @@ impl ChainClient for StarknetClient {
                 "   Order: {}-{} amount {} block {}",
                 tx.source_chain_id, tx.destination_chain_id, tx.amount, tx.block_number
             );
-            println!("   Calldata: {:?}", calldata);
+            println!("   Calldata: {calldata:?}");
 
             if dry_run {
                 println!("   ✅ Dry run - transaction prepared\n");
@@ -199,7 +199,7 @@ impl ChainClient for StarknetClient {
                     println!("   ✅ Success\n");
                 }
                 Err(e) => {
-                    println!("   ❌ Failed: {}\n", e);
+                    println!("   ❌ Failed: {e}\n");
                     return Err(e.into());
                 }
             }
@@ -314,7 +314,7 @@ impl ChainClient for StarknetClient {
                 println!("\n✅ Settlement successful!");
             }
             Err(e) => {
-                println!("\n❌ Transaction failed: {}", e);
+                println!("\n❌ Transaction failed: {e}");
                 return Err(e.into());
             }
         }
@@ -393,7 +393,7 @@ impl ChainClient for StarknetClient {
                 println!("   ✅ Success");
             }
             Err(e) => {
-                println!("   ❌ Failed: {}", e);
+                println!("   ❌ Failed: {e}");
                 return Err(e.into());
             }
         }

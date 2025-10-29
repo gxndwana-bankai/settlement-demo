@@ -28,10 +28,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let sp1_groth16_vk = get_sp1_vk();
 
-    let vkey_bytes: Vec<u8> = hex::decode(&proof_data.vkey.trim_start_matches("0x"))?;
+    let vkey_bytes: Vec<u8> = hex::decode(proof_data.vkey.trim_start_matches("0x"))?;
     let public_values_bytes: Vec<u8> =
-        hex::decode(&proof_data.public_values.trim_start_matches("0x"))?;
-    let proof_bytes: Vec<u8> = hex::decode(&proof_data.proof.trim_start_matches("0x"))?;
+        hex::decode(proof_data.public_values.trim_start_matches("0x"))?;
+    let proof_bytes: Vec<u8> = hex::decode(proof_data.proof.trim_start_matches("0x"))?;
 
     println!("🔧 Preprocessing with Garaga...");
     let groth16_proof = Groth16Proof::from_sp1(vkey_bytes, public_values_bytes, proof_bytes);
@@ -64,7 +64,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let output_path = "../contracts/starknet/src/fixtures/proof_fixture.json";
     fs::write(output_path, serde_json::to_string_pretty(&fixture)?)?;
 
-    println!("💾 Fixture saved to: {}", output_path);
+    println!("💾 Fixture saved to: {output_path}");
     println!();
     println!("🎯 You can now use this fixture in your Cairo tests!");
 

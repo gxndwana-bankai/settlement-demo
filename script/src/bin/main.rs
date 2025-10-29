@@ -85,7 +85,7 @@ async fn main() {
 
     // Add evm transactions to the batch
     for order in orders.clone() {
-        bankai_batch = bankai_batch.evm_tx(order.1.tx_hash.clone());
+        bankai_batch = bankai_batch.evm_tx(order.1.tx_hash);
     }
 
     // Execute the batch, generating all proofs for the added transactions
