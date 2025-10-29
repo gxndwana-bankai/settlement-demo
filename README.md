@@ -14,12 +14,6 @@ In an intent-based protocol, users state their desired outcome, and solvers exec
 
 This project mocks that flow:
 
-## The Settlement Architecture
-
-In an intent-based protocol, users state their desired outcome, and solvers execute the necessary transactions. A critical component is the settlement layer, which must trustlessly verify that a solver's execution on a destination chain (e.g., Ethereum L1) matches the user's intent before releasing the user's funds on a source chain (e.g., Arbitrum).
-
-This project mocks that flow:
-
 ![Settlement Architecture](resources/overview.png)
 
 1.  **Mock Orders**: We simulate user intents by submitting "orders" to settlement contracts on various source chains.
