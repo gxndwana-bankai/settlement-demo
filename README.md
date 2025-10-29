@@ -2,7 +2,7 @@
 
 This repository contains a demonstration of a trustless settlement mechanism for an intent-based protocol. It uses [Bankai's](https://www.bankai.xyz) stateless light clients to verify Ethereum L1 state on various source chains (EVM L2s, Solana, Starknet) and [SP1](https://succinct.xyz) to create a verifiable computation of the settlement logic.
 
-The key advantage of this stateless design is the elimination of dedicated, stateful light client contracts. Instead of deploying, maintaining, and perpetually syncing a complex contract on each target chain, this architecture relies on a simple, standard `Groth16` verifier. The verification logic can be exposed as a simple `view` function, making it easy and cheap to integrate while completely removing the burden of on-chain state management and ongoing synchronization costs.
+The key advantage of this stateless design is the elimination of dedicated, stateful light client contracts. Instead of deploying, maintaining, and perpetually syncing a dedicated light client on each target chain, this architecture relies on a simple, standard `Groth16` verifier. The verification logic can be exposed as a simple `view` function, making it easy and cheap to integrate while completely removing the burden of on-chain state management and ongoing synchronization costs.
 
 ## The Settlement Architecture
 
