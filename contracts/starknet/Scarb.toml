@@ -1,0 +1,21 @@
+[package]
+name = "settlement_starknet"
+version = "0.1.0"
+edition = "2024_07"
+
+[dependencies]
+starknet = "2.9.0"
+
+[dev-dependencies]
+snforge_std = { git = "https://github.com/foundry-rs/starknet-foundry.git", tag = "v0.35.1" }
+
+[scripts]
+test = "snforge test"
+deploy = "bash deploy.sh"
+
+[[target.starknet-contract]]
+sierra = true
+casm = true
+
+[tool.snforge]
+

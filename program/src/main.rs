@@ -8,23 +8,34 @@
 #![no_main]
 sp1_zkvm::entrypoint!(main);
 
-use alloy_sol_types::SolType;
-use fibonacci_lib::{fibonacci, PublicValuesStruct};
+use alloy_consensus::Transaction;
+use bankai_types::ProofWrapper;
+use bankai_verify::verify_batch_proof;
+use settlement_lib::{generate_merkle_root, Order};
 
 pub fn main() {
     // Read an input to the program.
-    //
-    // Behind the scenes, this compiles down to a custom system call which handles reading inputs
-    // from the prover.
-    let n = sp1_zkvm::io::read::<u32>();
+    println!("Entering zkVM...");
+    let proof_batch = sp1_zkvm::io::read::<ProofWrapper>();
+    let orders = sp1_zkvm::io::read::<Vec<Order>>();
+    println!("Retrieved Inputs...");
 
-    // Compute the n'th fibonacci number using a function from the workspace lib crate.
-    let (a, b) = fibonacci(n);
+    // verify the proof, containing all the claimed executions
+    let res = verify_batch_proof(proof_batch).unwrap();
 
-    // Encode the public values of the program.
-    let bytes = PublicValuesStruct::abi_encode(&PublicValuesStruct { n, a, b });
+    // iterate throught the orders, asserting they match the veried txs
+    for (index, order) in orders.iter().enumerate() {
+        println!("Verifying Order: {index:?}");
+        let tx = &res.evm.tx[index];
 
-    // Commit to the public values of the program. The final proof will have a commitment to all the
-    // bytes that were committed to.
-    sp1_zkvm::io::commit_slice(&bytes);
+        assert_eq!(tx.to(), Some(order.receiver));
+        assert_eq!(tx.value(), order.amount);
+        assert_eq!(tx.chain_id(), Some(order.destination_chain_id));
+    }
+    println!("All orders ok! Merkelizing...");
+
+    let root = generate_merkle_root(orders.as_slice());
+    println!("Verification Root: {root:?}");
+
+    sp1_zkvm::io::commit_slice(root.as_slice());
 }

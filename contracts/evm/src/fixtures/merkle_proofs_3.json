@@ -1,0 +1,47 @@
+{
+  "root": "0x95d5bfb307c4afa598b387b1ed84c0630fca1cb8a6039e79af93f841c4caeae7",
+  "proofs": [
+    {
+      "order": {
+        "source_chain_id": 2,
+        "destination_chain_id": 1,
+        "receiver": "0x797b212c0a4cb61dec7dc491b632b72d854e03fd",
+        "amount": "0x3cb609f5f3dd000",
+        "block_number": 9451455
+      },
+      "proof": [
+        "0x8c211a131c5f9210f13fb66f92f88f6b9c5e38fee40d4e9e49ca0fe671c86012",
+        "0xa215e87fe2566b1e6388ee69429f8d2e3d1deeeb42d7369865773a29223adcaf"
+      ],
+      "leaf_index": 0
+    },
+    {
+      "order": {
+        "source_chain_id": 1,
+        "destination_chain_id": 2,
+        "receiver": "0x1234567890123456789012345678901234567890",
+        "amount": "0x16345785d8a0000",
+        "block_number": 1000000
+      },
+      "proof": [
+        "0xc9b4519f38d458ee620c125c120b5e652f39b8839d8ba13f0b4c0ec9e24a0c96",
+        "0xa215e87fe2566b1e6388ee69429f8d2e3d1deeeb42d7369865773a29223adcaf"
+      ],
+      "leaf_index": 1
+    },
+    {
+      "order": {
+        "source_chain_id": 3,
+        "destination_chain_id": 1,
+        "receiver": "0xabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd",
+        "amount": "0x6f05b59d3b20000",
+        "block_number": 2000000
+      },
+      "proof": [
+        "0x5dea2798a57f7445ac4c6416f02302b4942bef1deffb1609b6a25a50f2a6134a",
+        "0xc33d5ef38b4aa40483d65eb3ec698b9b33c684eccf9564ac7673d0a58555bed2"
+      ],
+      "leaf_index": 2
+    }
+  ]
+}
