@@ -2,7 +2,7 @@
 
 This repository contains a demonstration of a trustless settlement mechanism for an intent-based protocol. It uses [Bankai's](https://www.bankai.xyz) stateless light clients to verify Ethereum L1 state on various source chains (EVM L2s, Solana, Starknet) and [SP1](https://succinct.xyz) to create a verifiable computation of the settlement logic.
 
-The key advantage of this stateless design is the elimination of dedicated, stateful light client contracts. Instead of deploying, maintaining, and perpetually syncing a dedicated light client on each target chain, this architecture relies on a simple, standard `Groth16` verifier. The verification logic can be exposed as a simple `view` function, making it easy and cheap to integrate while completely removing the burden of on-chain state management and ongoing synchronization costs.
+The key advantage of this stateless design is the elimination of dedicated, stateful light client contracts. Instead of deploying, maintaining, and perpetually syncing a complex contract on each target chain, this architecture relies on a simple, standard `Groth16` verifier. The verification logic can be exposed as a simple `view` function, making it easy and cheap to integrate while completely removing the burden of on-chain state management and ongoing synchronization costs.
 
 ## The Settlement Architecture
 
@@ -20,11 +20,9 @@ This project mocks that flow:
 
 The settlement mechanism is enabled by Bankai's stateless light clients.
 
-Instead of maintaining a dedicated light client on each source chain, Bankai uses ZK recursion to generate a single, constant-sized proof of Ethereum's history. This proof is synced entirely off-chain and acts as a portable, self-contained certificate of the canonical chain.
+Instead of maintaining a stateful light client on each source chain, Bankai uses ZK recursion to generate a single, constant-sized proof of Ethereum's history. This proof is synced entirely off-chain and acts as a portable, self-contained certificate of the canonical chain.
 
-Verification is performed on-demand by submitting this proof to a standard `Groth16` verifier contract. This eliminates the need for perpetual, expensive on-chain state synchronization and makes Ethereum's state accessible on any blockchain.
-
-You can monitor the status of the Bankai network and the availability of proofs on the [Bankai Sepolia Dashboard](https://sepolia.dashboard.bankai.xyz/).
+Verification is performed on-demand by submitting this proof to a standard, stateless `Groth16` verifier contract. This eliminates the need for setting up a dedicated light client deployment on each source chain, creating cost, complexity and perpetual onchain cost. Deploy the verifier contract, and access all light clients available in Bankai.
 
 ## End-to-End Data Flow
 
@@ -32,23 +30,27 @@ The settlement process is divided into off-chain data preparation, zkVM computat
 
 
 1.  **Data Fetching (Pre-zkVM)**
-    *   Bankai's infrastructure maintains an off-chain, recursive proof chain of Ethereum L1's state.
+    *   Bankai's infrastructure maintains an off-chain, recursive proof chain of Ethereum headers.
     *   To settle a batch of orders, a backend service uses the [Bankai SDK](https://github.com/bankaixyz/bankai-sdk) to query the Bankai API and retrieve the necessary proofs:
         *   The core Bankai block proof.
         *   MMR proofs for the specific block headers containing the settlement transactions.
     *   The service then fetches the transaction inclusion proofs (Merkle-Patricia proofs) for each settlement transaction from a standard Ethereum RPC endpoint.
 
 2.  **ZK Program Execution (Inside SP1 zkVM)**
-    *   The fetched proofs and the list of orders are supplied as inputs to the SP1 program (`program/src/main.rs`).
-    *   Inside the zkVM, the program executes the core verification logic using the [Bankai SDK](https://github.com/bankaixyz/bankai-sdk):
-        1.  It verifies the Bankai proof, establishing a trustless root of Ethereum's state.
+
+    -   The fetched proofs and the list of orders are supplied as inputs to the SP1 program (`program/src/main.rs`).
+    -   Inside the zkVM, the program executes the core verification logic using the Bankai SDK:
+
+        1.  It verifies the Bankai proof, establishing a trustless MMR root containing the Ethereum headers.
         2.  It verifies the MMR proofs and the transaction inclusion proofs against this state.
         3.  It executes custom logic to assert that the details of the proven transactions (e.g., `to`, `value`) precisely match the specifications of the initial orders.
-    *   The program's public output is a Merkle root of all the validated orders.
+
+    -   The program's public output is a Merkle root of all the validated orders.
 
 3.  **Proof Generation**
-    *   The execution trace of the SP1 program is sent to the SP1 Prover Network.
-    *   The network generates a final, compact `Groth16` proof of the entire computation. This single proof encapsulates the validity of the Bankai state, the transaction inclusion, and the custom matching logic.
+
+    -   The execution trace of the SP1 program is sent to the SP1 Prover Network.
+    -   The network generates a final, compact `Groth16` proof of the entire computation. This single proof encapsulates the validity of the Bankai state, the transaction inclusion, and the custom matching logic.
 
 4.  **On-Chain Settlement (Using the CLI)**
     *   With the `Groth16` proof generated, the `settlement-cli` tool is used to call the `settleOrders` function on the settlement contracts on the source chains.
@@ -56,7 +58,7 @@ The settlement process is divided into off-chain data preparation, zkVM computat
 
 ![Data Flow](resources/flow.png)
 
-The final `Groth16` proof is a self-contained, portable certificate of execution that can be verified on any chain with a standard verifier contract. No chain-specific infrastructure needs to be deployed, maintained and kept in sync using onchain TXs. This is the core advantage enabled by the stateless light client design: it makes trustless cross-chain state verification simple, cheap, and universally accessible.
+The key takeaway from this data flow is the creation of a universal settlement layer. The final `Groth16` proof is a self-contained, portable certificate of execution that can be verified on any chain with a standard verifier contract. No chain-specific infrastructure needs to be deployed or maintained in a synced state. This is the core advantage enabled by the stateless light client design: it makes trustless cross-chain state verification simple, cheap, and universally accessible. The core promise of Bankai is that any light client integrated into the network can be accessed on any chain through this single, standardized verifier. While this demo uses an Ethereum L1 light client, Bankai is expanding to include common L2s and other L1s. This will enable developers to create complex, multi-chain settlement programs (like this one) that can trustlessly verify state from any supported chain, all through a single SP1 program and a standard on-chain verifier.
 
 ## Project Components
 
@@ -158,7 +160,6 @@ cargo run --release --bin cli -- settle starknet-sepolia
 ```
 
 The contract verifies the proof, and the orders are marked as settled on-chain.
-
 ## Live Demo Examples
 
 Here are some links to live transactions from a deployment of this demo:
