@@ -34,6 +34,10 @@ This project mocks that flow:
 2.  **Prove Execution**: A backend process generates a ZK proof attesting that the corresponding transactions were executed on Ethereum L1 and match the order details.
 3.  **Settle**: The single ZK proof is used to settle the orders across all source chains.
 
+## Watch the Demo
+[![Watch the demo](https://img.youtube.com/vi/NejkvCkLnuo/hqdefault.jpg)](https://www.youtube.com/watch?v=NejkvCkLnuo)
+
+
 ## Core Technology: Bankai Stateless Light Clients
 
 The settlement mechanism is enabled by Bankai's stateless light clients.
